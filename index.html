@@ -31,11 +31,16 @@
     .listing-meta .stars { color: #222; font-weight: 600; }
     .superhost-badge { background: #FF385C; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
     .listing-meta .location { color: #888; }
-    /* Top hero: gallery on the left, booking card on the right */
-    .top-hero { display: grid; grid-template-columns: 1fr 320px; gap: 28px; align-items: start; margin: 16px 0 32px; }
+    /* Main layout: gallery + description on the left, booking card spans full height on the right */
+    .main-grid { display: grid; grid-template-columns: 1fr 320px;
+      grid-template-areas: "gallery booking" "content booking";
+      column-gap: 32px; row-gap: 4px; align-items: start; margin: 16px 0 32px; }
+    .main-grid > .gallery { grid-area: gallery; }
+    .main-grid > .booking-wrapper { grid-area: booking; }
+    .main-grid > .content-area { grid-area: content; }
     .gallery { display: flex; flex-direction: column; gap: 8px; border-radius: 16px; overflow: hidden; margin: 0; }
-    .gallery-main { height: 300px; position: relative; border-radius: 12px; overflow: hidden; }
-    .gallery-right { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; height: 110px; }
+    .gallery-main { height: 380px; position: relative; border-radius: 12px; overflow: hidden; }
+    .gallery-right { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; height: 130px; }
     .photo-box { position: relative; overflow: hidden; cursor: pointer; }
     .photo-box-inner { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #fff; font-weight: 600; font-size: 13px; text-align: center; padding: 12px; transition: transform 0.25s; }
     .photo-box:hover .photo-box-inner { transform: scale(1.03); }
@@ -107,8 +112,8 @@
     footer { background: #f7f7f7; border-top: 1px solid #ebebeb; padding: 36px 24px; margin-top: 60px; text-align: center; font-size: 13px; color: #888; }
     footer strong { color: #FF385C; }
     @media (max-width: 860px) {
-      .top-hero { grid-template-columns: 1fr; }
-      .booking-wrapper { position: static; }
+      .main-grid { grid-template-columns: 1fr; grid-template-areas: "gallery" "booking" "content"; }
+      .booking-wrapper { position: static; margin-bottom: 28px; }
     }
     @media (max-width: 680px) {
       .reviews-grid { grid-template-columns: 1fr; }
@@ -271,8 +276,8 @@
     </div>
   </div>
 
-  <!-- TOP HERO: gallery (left) + booking card with calendar (right) -->
-  <div class="top-hero">
+  <!-- MAIN GRID: gallery + description (left), booking card with calendar spans full height (right) -->
+  <div class="main-grid">
   <!-- PHOTO GALLERY: EDIT captions and color classes gb-1 through gb-5 -->
   <div class="gallery">
     <div class="photo-box gallery-main">
@@ -334,7 +339,7 @@
               &#127859; <strong>Fuckerflakes</strong><br><span style="font-size:10px;color:#888;">Classic. Divisive.</span>
             </div>
             <div class="breakfast-opt" id="bfast-kariot" onclick="selectBreakfast('kariot')">
-              &#129367; <strong>Kariot</strong><br><span style="font-size:10px;color:#888;">Soft. Comforting.</span>
+              &#129367;&#129371; <strong>Kariot</strong><br><span style="font-size:10px;color:#888;">Soft. Comforting.</span>
             </div>
           </div>
         </div>
@@ -351,9 +356,6 @@
       </div>
     </div>
 
-  </div>
-  <!-- END TOP HERO -->
-
   <div class="content-area">
     <div class="listing-content">
 
@@ -369,7 +371,7 @@
       <!-- DESCRIPTION: EDIT this paragraph -->
       <div class="section">
         <h2 class="section-title">About this place</h2>
-        <p>Welcome to the legendary Greenboim Estate &mdash; a one-of-a-kind property nestled somewhere between &ldquo;guest room&rdquo; and &ldquo;just sit anywhere, there's room on the couch.&rdquo; Your host, Hadar, is a seasoned Superhost who has been involuntarily hosting siblings, cousins, and the occasional stray friend since approximately 1997. The vibe is <em>cozy-chaotic</em>: you'll be treated like family (because you are), which means you'll be offered snacks, then immediately judged for which ones you chose. The room comes fully furnished with Hadar's unsolicited opinions and a duvet of uncertain cleanliness. Minimum stay: however long it takes before the gentle hints about heading home begin.</p>
+        <p>Welcome to the legendary Greenboim Estate &mdash; a one-of-a-kind property nestled somewhere between &ldquo;guest room&rdquo; and &ldquo;just sit anywhere, there's room on the couch.&rdquo; Your host, Hadar, is a seasoned Superhost who has been involuntarily hosting siblings, cousins, parents, and the occasional stray friend since approximately 1997 &mdash; and since August 2025, hasn&rsquo;t had a break since. The vibe is <em>cozy-chaotic</em>: you'll be treated like family (because you are), which means you'll be offered snacks, then immediately judged for which ones you chose. The room comes fully furnished with Hadar's unsolicited opinions and a duvet of uncertain cleanliness. Minimum stay: however long it takes before the gentle hints about heading home begin.</p>
       </div>
 
       <!-- AMENITIES: EDIT items -->
@@ -485,7 +487,7 @@
               <div><div class="reviewer-name">Pitzi R.</div><div class="reviewer-date">December 2024</div></div>
             </div>
             <div class="review-stars">&#9733;&#9733;&#9733;&#9734;&#9734;</div>
-            <p class="review-text">Genuinely could not tell if I was staying in a home or a concert venue. Udi watches TV at a volume that I can only describe as &ldquo;structural.&rdquo; I asked if we could turn it down. He said &ldquo;it's on low.&rdquo; It was not on low. I now own earplugs. I brought them from home. I left them there because I knew I'd need them again.</p>
+            <p class="review-text">Genuinely could not tell if I was staying in a home or a concert venue. Udi watches TV at a volume that I can only describe as &ldquo;structural.&rdquo; I asked if we could turn it down. He said &ldquo;it's on low.&rdquo; It was not on low. And when the TV finally goes quiet, the kids take over &mdash; running, shrieking, negotiating bedtime like hostage takers. I now own earplugs. I brought them from home. I left them there because I knew I'd need them again.</p>
           </div>
 
           <div class="review-card">
@@ -513,6 +515,8 @@
 
     </div>
     <!-- END LEFT COLUMN -->
+  </div>
+  <!-- END MAIN GRID -->
   </div>
 </div>
 
@@ -555,7 +559,7 @@
     },
     topfloor: {
       name: '&#128704; Top Floor Room',
-      desc: 'Cozy room on the top floor. Real bed. Shared bathroom with other guests &mdash; and whoever else Hadar has let in.',
+      desc: 'Cozy room on the top floor. Not a real bed &mdash; it&rsquo;s a mattress on the floor. Shared bathroom with other guests &mdash; and whoever else Hadar has let in.',
       sub: '1–2 guests &middot; Shared bathroom &middot; &#127774; Natural light (probably)',
       price: '$0 / night + feelings',
       booked: []
