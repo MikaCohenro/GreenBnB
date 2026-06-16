@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- EDIT: Change the browser tab title below -->
+  <title>GreenBnB – Cozy Room at the Greenboim Estate</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #fff; color: #222; font-size: 16px; line-height: 1.5;
+    }
+    a { color: inherit; text-decoration: none; }
+    nav {
+      position: sticky; top: 0; z-index: 100; background: #fff;
+      border-bottom: 1px solid #ebebeb; padding: 0 24px; height: 80px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 22px; color: #FF385C; letter-spacing: -0.5px; }
+    .logo svg { width: 32px; height: 32px; }
+    .nav-links { display: flex; gap: 20px; font-size: 14px; font-weight: 500; color: #555; }
+    .nav-links a:hover { color: #222; }
+    .nav-avatar { width: 36px; height: 36px; border-radius: 50%; background: #FF385C; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; cursor: pointer; border: 2px solid #ebebeb; }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+    .listing-header { padding: 28px 0 16px; }
+    .listing-title { font-size: 26px; font-weight: 600; margin-bottom: 10px; line-height: 1.3; }
+    .listing-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 14px; align-items: center; color: #444; }
+    .listing-meta .stars { color: #222; font-weight: 600; }
+    .superhost-badge { background: #FF385C; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+    .listing-meta .location { color: #888; }
+    .gallery { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 200px 200px; gap: 8px; border-radius: 16px; overflow: hidden; margin: 16px 0 32px; }
+    .gallery-main { grid-row: 1 / 3; position: relative; }
+    .gallery-right { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; }
+    .photo-box { position: relative; overflow: hidden; cursor: pointer; }
+    .photo-box-inner { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #fff; font-weight: 600; font-size: 13px; text-align: center; padding: 12px; transition: transform 0.25s; }
+    .photo-box:hover .photo-box-inner { transform: scale(1.03); }
+    .photo-box-inner .emoji { font-size: 36px; }
+    .photo-caption { background: rgba(0,0,0,0.35); padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+    .gb-1 { background: #7b9ea6; }
+    .gb-2 { background: #a67b5b; }
+    .gb-3 { background: #6b8f71; }
+    .gb-4 { background: #8f6b6b; }
+    .gb-5 { background: #6b718f; }
+    .content-area { display: grid; grid-template-columns: 1fr 380px; gap: 72px; align-items: start; }
+    .listing-content { min-width: 0; }
+    .host-section { display: flex; align-items: center; gap: 16px; padding: 28px 0; border-top: 1px solid #ebebeb; border-bottom: 1px solid #ebebeb; }
+    .host-avatar { width: 56px; height: 56px; border-radius: 50%; background: #4a90d9; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; flex-shrink: 0; }
+    .host-name { font-size: 17px; font-weight: 600; margin-bottom: 3px; }
+    .host-sub { font-size: 13px; color: #888; }
+    .section { padding: 28px 0; border-bottom: 1px solid #ebebeb; }
+    .section:last-child { border-bottom: none; }
+    .section-title { font-size: 20px; font-weight: 600; margin-bottom: 16px; }
+    .section p { color: #444; line-height: 1.7; }
+    .amenities-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .amenity-item { display: flex; align-items: center; gap: 12px; font-size: 15px; color: #333; }
+    .amenity-item .amenity-icon { font-size: 22px; flex-shrink: 0; }
+    .rules-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .rules-list li { display: flex; align-items: flex-start; gap: 12px; font-size: 15px; color: #333; }
+    .rules-list li .rule-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .reviews-summary { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .big-rating { font-size: 40px; font-weight: 700; }
+    .rating-label { font-size: 15px; color: #555; }
+    .reviews-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    .review-card { padding: 0; }
+    .reviewer-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .reviewer-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: #fff; flex-shrink: 0; }
+    .reviewer-name { font-weight: 600; font-size: 14px; }
+    .reviewer-date { font-size: 12px; color: #888; }
+    .review-stars { font-size: 12px; color: #FF385C; margin-bottom: 6px; }
+    .review-text { font-size: 14px; color: #444; line-height: 1.65; }
+    .booking-wrapper { position: sticky; top: 100px; }
+    .booking-card { border: 1px solid #ebebeb; border-radius: 16px; padding: 24px; box-shadow: 0 6px 20px rgba(0,0,0,0.10); }
+    .booking-price { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .booking-price span { font-size: 15px; font-weight: 400; color: #888; }
+    .booking-price .price-note { display: block; font-size: 12px; color: #FF385C; font-weight: 500; margin-top: 2px; }
+    .booking-rating { font-size: 13px; color: #444; margin-bottom: 18px; display: flex; align-items: center; gap: 6px; }
+    .date-grid { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #b0b0b0; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+    .date-field { padding: 10px 14px; cursor: pointer; }
+    .date-field:first-child { border-right: 1px solid #b0b0b0; }
+    .date-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #555; letter-spacing: 0.5px; }
+    .date-value { font-size: 14px; color: #222; margin-top: 2px; }
+    .guests-field { border: 1px solid #b0b0b0; border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; cursor: pointer; }
+    .guests-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #555; letter-spacing: 0.5px; }
+    .guests-value { font-size: 14px; color: #222; margin-top: 2px; }
+    .reserve-btn { width: 100%; background: linear-gradient(135deg, #FF385C, #e0284e); color: #fff; border: none; border-radius: 10px; padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; letter-spacing: 0.2px; }
+    .reserve-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+    .reserve-btn:active { transform: translateY(0); }
+    .booking-note { text-align: center; font-size: 12px; color: #888; margin-top: 12px; }
+    .price-breakdown { margin-top: 18px; border-top: 1px solid #ebebeb; padding-top: 16px; font-size: 14px; color: #444; display: flex; flex-direction: column; gap: 10px; }
+    .price-row { display: flex; justify-content: space-between; }
+    .price-row.total { font-weight: 700; color: #222; border-top: 1px solid #ebebeb; padding-top: 10px; margin-top: 4px; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 999; align-items: center; justify-content: center; padding: 24px; }
+    .modal-overlay.active { display: flex; }
+    .modal-box { background: #fff; border-radius: 20px; padding: 36px 32px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.25); animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-emoji { font-size: 56px; margin-bottom: 16px; }
+    .modal-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; color: #222; }
+    .modal-msg { font-size: 15px; color: #555; line-height: 1.6; margin-bottom: 24px; }
+    .modal-close { background: #FF385C; color: #fff; border: none; border-radius: 10px; padding: 12px 28px; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+    .modal-close:hover { opacity: 0.88; }
+    .modal-fine-print { font-size: 11px; color: #bbb; margin-top: 14px; }
+    footer { background: #f7f7f7; border-top: 1px solid #ebebeb; padding: 36px 24px; margin-top: 60px; text-align: center; font-size: 13px; color: #888; }
+    footer strong { color: #FF385C; }
+    @media (max-width: 900px) {
+      .content-area { grid-template-columns: 1fr; gap: 0; }
+      .booking-wrapper { position: static; padding: 28px 0; }
+      .reviews-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .listing-title { font-size: 20px; }
+      .gallery { grid-template-columns: 1fr; grid-template-rows: 220px auto; height: auto; }
+      .gallery-main { grid-row: auto; height: 220px; }
+      .gallery-right { grid-template-columns: 1fr 1fr; grid-template-rows: 120px 120px; }
+      .amenities-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .big-rating { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV BAR -->
+<nav>
+  <div class="logo">
+    <!-- EDIT: Swap SVG with emoji 🏠 if preferred -->
+    <svg viewBox="0 0 32 32" fill="#FF385C" xmlns="http://www.w3.org/2000/svg"><path d="M16 2L2 14h4v14h8v-8h4v8h8V14h4L16 2z"/></svg>
+    GreenBnB
+  </div>
+  <div class="nav-links">
+    <!-- EDIT: Fake nav items -->
+    <a href="#">Stays</a>
+    <a href="#">Experiences</a>
+    <a href="#">Sibling Drama</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-links"><a href="#">Become a Host</a></div>
+    <!-- EDIT: Change initial (G = Greenboim) -->
+    <div class="nav-avatar" title="Profile">G</div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="listing-header">
+    <!-- EDIT: Listing title and sister's name -->
+    <h1 class="listing-title">
+      Cozy Private Room in Rachel's House &middot; The Entire Sibling Experience&trade;
+    </h1>
+    <div class="listing-meta">
+      <span class="stars">&#9733; 4.97</span>
+      <span>&middot;</span>
+      <span><strong>312 reviews</strong></span>
+      <span>&middot;</span>
+      <span class="superhost-badge">Superhost</span>
+      <span>&middot;</span>
+      <!-- EDIT: Fake location -->
+      <span class="location">&#128205; Greenboim Estate, New Jersey, USA</span>
+    </div>
+  </div>
+
+  <!-- PHOTO GALLERY: EDIT captions and color classes gb-1 through gb-5 -->
+  <div class="gallery">
+    <div class="photo-box gallery-main">
+      <div class="photo-box-inner gb-1">
+        <span class="emoji">&#128715;</span>
+        <span class="photo-caption">The Couch (Premium Suite)</span>
+      </div>
+    </div>
+    <div class="gallery-right">
+      <div class="photo-box"><div class="photo-box-inner gb-2"><span class="emoji">&#128703;</span><span class="photo-caption">Bathroom &mdash; shared, obviously</span></div></div>
+      <div class="photo-box"><div class="photo-box-inner gb-3"><span class="emoji">&#127829;</span><span class="photo-caption">Kitchen &mdash; snacks NOT included</span></div></div>
+      <div class="photo-box"><div class="photo-box-inner gb-4"><span class="emoji">&#128682;</span><span class="photo-caption">The Hallway (en-suite corridor)</span></div></div>
+      <div class="photo-box"><div class="photo-box-inner gb-5"><span class="emoji">&#127807;</span><span class="photo-caption">Backyard / Smoking Area / Storage</span></div></div>
+    </div>
+  </div>
+
+  <div class="content-area">
+    <div class="listing-content">
+
+      <!-- HOST: EDIT name and sub-text -->
+      <div class="host-section">
+        <div class="host-avatar">R</div>
+        <div>
+          <div class="host-name">Hosted by Rachel Greenboim</div>
+          <div class="host-sub">Superhost &middot; Hosting since birth &middot; 1 guest limit (it's you)</div>
+        </div>
+      </div>
+
+      <!-- DESCRIPTION: EDIT this paragraph -->
+      <div class="section">
+        <h2 class="section-title">About this place</h2>
+        <p>Welcome to the legendary Greenboim Estate &mdash; a one-of-a-kind property nestled somewhere between &ldquo;guest room&rdquo; and &ldquo;just sit anywhere, there's room on the couch.&rdquo; Your host, Rachel, is a seasoned Superhost who has been involuntarily hosting siblings, cousins, and the occasional stray friend since approximately 1997. The vibe is <em>cozy-chaotic</em>: you'll be treated like family (because you are), which means you'll be offered snacks, then immediately judged for which ones you chose. The room comes fully furnished with Rachel's unsolicited opinions and a duvet she's not sure is clean. Minimum stay: however long it takes her to subtly suggest you should really be getting home.</p>
+      </div>
+
+      <!-- AMENITIES: EDIT items -->
+      <div class="section">
+        <h2 class="section-title">What this place offers</h2>
+        <div class="amenities-grid">
+          <div class="amenity-item"><span class="amenity-icon">&#128483;</span> Unsolicited life advice</div>
+          <div class="amenity-item"><span class="amenity-icon">&#128246;</span> Wi-Fi (password changes weekly, she won't tell you)</div>
+          <div class="amenity-item"><span class="amenity-icon">&#129488;</span> Free judgment (24/7)</div>
+          <div class="amenity-item"><span class="amenity-icon">&#128705;</span> Hot water (intermittent)</div>
+          <div class="amenity-item"><span class="amenity-icon">&#127987;</span> 1 (one) clean towel</div>
+          <div class="amenity-item"><span class="amenity-icon">&#128049;</span> Cat who will ignore you</div>
+          <div class="amenity-item"><span class="amenity-icon">&#128250;</span> TV (she controls the remote)</div>
+          <div class="amenity-item"><span class="amenity-icon">&#129474;</span> Fully stocked spice rack (do not touch)</div>
+          <div class="amenity-item"><span class="amenity-icon">&#128716;</span> Pillow (singular)</div>
+          <div class="amenity-item"><span class="amenity-icon">&#127796;</span> Plants that judge you silently</div>
+        </div>
+      </div>
+
+      <!-- HOUSE RULES: EDIT items -->
+      <div class="section">
+        <h2 class="section-title">House rules</h2>
+        <ul class="rules-list">
+          <li><span class="rule-icon">&#127769;</span> Quiet hours: whenever she's napping (so, basically always)</li>
+          <li><span class="rule-icon">&#127777;</span> No touching the thermostat. Not even to look at it.</li>
+          <li><span class="rule-icon">&#129381;</span> Replace anything you eat, or perish.</li>
+          <li><span class="rule-icon">&#128701;</span> The bathroom schedule is negotiable, but she'll win.</li>
+          <li><span class="rule-icon">&#127925;</span> No music after 9 PM unless it's her playlist.</li>
+          <li><span class="rule-icon">&#129529;</span> You will help clean up. This is not a request.</li>
+          <li><span class="rule-icon">&#128245;</span> You may not leave negative reviews. She will find out.</li>
+          <li><span class="rule-icon">&#128172;</span> No calling Mom unless host has approved the narrative first.</li>
+        </ul>
+      </div>
+
+      <!-- REVIEWS: EDIT names, dates, avatar initials, bg colors, and text -->
+      <div class="section">
+        <h2 class="section-title">Guest reviews</h2>
+        <div class="reviews-summary">
+          <div class="big-rating">&#9733; 4.97</div>
+          <div>
+            <div style="font-weight:600; font-size:15px;">312 reviews</div>
+            <div class="rating-label">GreenBnB Certified&trade;</div>
+          </div>
+        </div>
+        <div class="reviews-grid">
+
+          <div class="review-card">
+            <div class="reviewer-header">
+              <div class="reviewer-avatar" style="background:#e07b4a;">D</div>
+              <div><div class="reviewer-name">Daniel K.</div><div class="reviewer-date">March 2025</div></div>
+            </div>
+            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p class="review-text">Arrived with one bag, left with a tupperware of leftovers and a small identity crisis. Host told me my career choices were &ldquo;interesting.&rdquo; Slept like a baby (the towel was damp but it's fine). Would absolutely return, 10/10.</p>
+          </div>
+
+          <div class="review-card">
+            <div class="reviewer-header">
+              <div class="reviewer-avatar" style="background:#5b8a5e;">M</div>
+              <div><div class="reviewer-name">Miriam L.</div><div class="reviewer-date">January 2025</div></div>
+            </div>
+            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p class="review-text">The cat was listed as an amenity. The cat was NOT an amenity. The cat stared at me for three days and knocked my water off the nightstand. The host said &ldquo;yeah, she does that.&rdquo; Otherwise a delightful stay. The Wi-Fi worked on day two.</p>
+          </div>
+
+          <div class="review-card">
+            <div class="reviewer-header">
+              <div class="reviewer-avatar" style="background:#6b6baf;">A</div>
+              <div><div class="reviewer-name">Avi G.</div><div class="reviewer-date">November 2024</div></div>
+            </div>
+            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+            <p class="review-text">Four stars only because she changed the Wi-Fi password while I was in the middle of a Zoom call and denied it. Otherwise exceptional. The unsolicited life advice was accurate and I'm now pursuing a different career. Deducting one star on principle.</p>
+          </div>
+
+          <div class="review-card">
+            <div class="reviewer-header">
+              <div class="reviewer-avatar" style="background:#b06b6b;">S</div>
+              <div><div class="reviewer-name">Sasha R.</div><div class="reviewer-date">August 2024</div></div>
+            </div>
+            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p class="review-text">Showed up unannounced (as instructed by the listing). Host opened the door, sighed deeply, and handed me a pillow. No words were exchanged. By day three we were watching reality TV together and sharing a blanket. Peak hospitality. Will return.</p>
+          </div>
+
+          <div class="review-card">
+            <div class="reviewer-header">
+              <div class="reviewer-avatar" style="background:#4a8f9f;">T</div>
+              <div><div class="reviewer-name">Tamar B.</div><div class="reviewer-date">June 2024</div></div>
+            </div>
+            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p class="review-text">The kitchen smelled amazing but I was not allowed near it. The host cooked something incredible and then ate it while making eye contact with me. She did eventually give me a plate. I cried. Five stars for the emotional range of this experience alone.</p>
+          </div>
+
+          <div class="review-card">
+            <div class="reviewer-header">
+              <div class="reviewer-avatar" style="background:#7a9f4a;">Y</div>
+              <div><div class="reviewer-name">Yossi F.</div><div class="reviewer-date">April 2024</div></div>
+            </div>
+            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p class="review-text">Genuinely the most comfortable couch I have ever slept on. Would live there permanently if I were allowed. (I am not allowed. Host made that clear on day five.) Highly recommend the backyard &mdash; great stars, slight smell of BBQ and old memories.</p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+    <!-- END LEFT COLUMN -->
+
+    <!-- BOOKING CARD -->
+    <div class="booking-wrapper">
+      <div class="booking-card">
+        <!-- EDIT: price and note -->
+        <div class="booking-price">
+          $0 <span>/ night</span>
+          <span class="price-note">+ emotional labor (billed separately)</span>
+        </div>
+        <div class="booking-rating">&#9733; 4.97 &middot; <span style="text-decoration:underline; cursor:pointer;">312 reviews</span></div>
+        <div class="date-grid">
+          <div class="date-field">
+            <div class="date-label">Check-in</div>
+            <!-- EDIT: check-in / checkout display text -->
+            <div class="date-value">Whenever</div>
+          </div>
+          <div class="date-field">
+            <div class="date-label">Checkout</div>
+            <div class="date-value">She'll tell you</div>
+          </div>
+        </div>
+        <div class="guests-field">
+          <div class="guests-label">Guests</div>
+          <div class="guests-value">1 sibling (no plus ones)</div>
+        </div>
+        <!-- EDIT: Reserve button text -->
+        <button class="reserve-btn" onclick="showModal()">Reserve (It's Free, Technically)</button>
+        <p class="booking-note">You won't be charged &mdash; but you will owe her one.</p>
+        <!-- EDIT: price breakdown rows -->
+        <div class="price-breakdown">
+          <div class="price-row"><span>$0 &times; 3 nights</span><span>$0</span></div>
+          <div class="price-row"><span>Guilt fee</span><span>$0</span></div>
+          <div class="price-row"><span>Sibling discount</span><span>-$0</span></div>
+          <div class="price-row total"><span>Total</span><span>$0 + feelings</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2025 <strong>GreenBnB&trade;</strong> &middot; &ldquo;Boim &amp; Breakfast &mdash; hosting you whether you asked or not&rdquo;</p>
+  <p style="margin-top:8px;">Not affiliated with Airbnb. Not affiliated with good planning. This is a joke, Rachel. We love you.</p>
+</footer>
+
+<!-- MODAL: EDIT emoji, title, and message -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-emoji">&#127968;</div>
+    <div class="modal-title">Booking Request Sent!</div>
+    <p class="modal-msg">
+      Rachel has <strong>30 days</strong> to pretend she didn't see this.<br><br>
+      In the meantime, we suggest packing light (she has no extra hangers),
+      bringing your own snacks (she'll eat them), and preparing a short speech
+      about why you've made good life choices.
+    </p>
+    <button class="modal-close" onclick="closeModal()">Got it, I'll show up anyway</button>
+    <p class="modal-fine-print">No actual booking was made. Rachel is not legally responsible for this stay.</p>
+  </div>
+</div>
+
+<script>
+  function showModal() {
+    document.getElementById('modalOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+</script>
+
+</body>
+</html>
