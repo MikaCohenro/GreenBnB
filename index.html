@@ -252,6 +252,21 @@
       transition:all 0.15s; font-family:inherit; }
     .res-cancel:hover { background:#FF385C; color:#fff; }
 
+    /* Host view: all reservations across rooms */
+    .host-view { margin-top:14px; border-top:1px solid #ebebeb; padding-top:12px; }
+    .host-toggle { width:100%; background:#f5f5f5; border:1px solid #e0e0e0; border-radius:8px;
+      padding:8px 10px; font-size:12px; font-weight:600; color:#444; cursor:pointer;
+      font-family:inherit; transition:background 0.15s; }
+    .host-toggle:hover { background:#ececec; }
+    .host-list { margin-top:10px; }
+    .host-room { margin-bottom:12px; }
+    .host-room-name { font-size:11px; font-weight:700; color:#222; margin-bottom:5px; }
+    .host-res { display:flex; justify-content:space-between; gap:8px; font-size:12px; color:#444;
+      padding:5px 8px; background:#f9f9f9; border-radius:6px; margin-bottom:4px; }
+    .host-res strong { color:#222; }
+    .host-res .host-res-dates { color:#888; font-size:11px; white-space:nowrap; }
+    .host-empty { font-size:11px; color:#aaa; font-style:italic; padding:2px 0; }
+
     /* Availability badge */
     .avail-badge { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px;
       border-radius:20px; margin-left:6px; }
@@ -398,6 +413,13 @@
         </div>
 
         <div class="my-reservations" id="my-reservations"></div>
+
+        <div class="host-view">
+          <button type="button" class="host-toggle" onclick="toggleHostView()">
+            &#128203; Host view &mdash; who booked what
+          </button>
+          <div class="host-list" id="host-list" style="display:none;"></div>
+        </div>
 
       </div>
     </div>
@@ -632,10 +654,37 @@
     var now = new Date();
     calYear = now.getFullYear();
     calMonth = now.getMonth();
+    loadReservations();
     renderCal();
     updateBadges();
     renderMyReservations();
   });
+
+  // ============================================================
+  // PERSISTENCE (localStorage — survives refresh/restart, per-browser)
+  // ============================================================
+  var STORAGE_KEY = 'greenbnb_reservations_v1';
+
+  function saveReservations() {
+    var data = {};
+    Object.keys(ROOMS).forEach(function(key) {
+      data[key] = ROOMS[key].booked.filter(function(b) { return b.mine; });
+    });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+  }
+
+  function loadReservations() {
+    var raw;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { return; }
+    if (!raw) return;
+    var data;
+    try { data = JSON.parse(raw); } catch (e) { return; }
+    Object.keys(ROOMS).forEach(function(key) {
+      if (Array.isArray(data[key])) {
+        data[key].forEach(function(b) { b.mine = true; ROOMS[key].booked.push(b); });
+      }
+    });
+  }
 
   // ============================================================
   // ROOM SELECTION
@@ -852,12 +901,14 @@
     showModal();
     // Add to booked (client-side only, resets on refresh)
     ROOMS[currentRoom].booked.push({ id: Date.now(), name: resName, guests: guests, from: selStart, to: selEnd, mine: true });
+    saveReservations();
     updateBadges();
     selStart = null; selEnd = null;
     document.getElementById('res-name').value = '';
     document.getElementById('res-guests').value = '1';
     renderCal();
     renderMyReservations();
+    renderHostView();
   }
 
   // ============================================================
@@ -883,15 +934,50 @@
   function cancelReservation(id) {
     var room = ROOMS[currentRoom];
     room.booked = room.booked.filter(function(b) { return b.id !== id; });
+    saveReservations();
     updateBadges();
     renderCal();
     renderMyReservations();
+    renderHostView();
   }
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function(c) {
       return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
     });
+  }
+
+  function toggleHostView() {
+    var list = document.getElementById('host-list');
+    if (list.style.display === 'none') {
+      renderHostView();
+      list.style.display = 'block';
+    } else {
+      list.style.display = 'none';
+    }
+  }
+
+  function renderHostView() {
+    var list = document.getElementById('host-list');
+    if (!list || list.style.display === 'none') return;
+    var html = '';
+    Object.keys(ROOMS).forEach(function(key) {
+      var r = ROOMS[key];
+      var rName = r.name.replace(/&#[0-9]+;/g, '').trim();
+      html += '<div class="host-room"><div class="host-room-name">' + escapeHtml(rName) + '</div>';
+      if (!r.booked.length) {
+        html += '<div class="host-empty">No reservations</div>';
+      } else {
+        r.booked.slice().sort(function(a, b) { return a.from < b.from ? -1 : 1; }).forEach(function(b) {
+          var who = b.guests ? (b.guests + ' guest' + (b.guests === 1 ? '' : 's')) : '';
+          html += '<div class="host-res"><span><strong>' + escapeHtml(b.name || 'Guest') + '</strong>' +
+            (who ? ' &middot; ' + who : '') + '</span>' +
+            '<span class="host-res-dates">' + formatDate(b.from) + ' &rarr; ' + formatDate(b.to) + '</span></div>';
+        });
+      }
+      html += '</div>';
+    });
+    list.innerHTML = html;
   }
 
   // ============================================================
