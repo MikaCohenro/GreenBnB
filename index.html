@@ -152,6 +152,75 @@
     }
     .splash-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(255,56,92,0.45); }
     .splash-btn:active { transform: translateY(0); }
+
+    /* ===== ROOM PICKER ===== */
+    .room-tabs { display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+    .room-tab {
+      flex:1; min-width:80px; padding:8px 6px; border:2px solid #ebebeb;
+      border-radius:10px; background:#fff; cursor:pointer; font-size:12px;
+      font-weight:600; color:#555; text-align:center; transition:all 0.2s;
+      line-height:1.3;
+    }
+    .room-tab:hover { border-color:#FF385C; color:#FF385C; }
+    .room-tab.active { border-color:#FF385C; background:#FF385C; color:#fff; }
+    .room-info { font-size:13px; color:#555; margin-bottom:14px; padding:10px 14px;
+      background:#f9f9f9; border-radius:10px; line-height:1.6; }
+    .room-info strong { color:#222; }
+    .room-price { font-size:22px; font-weight:700; margin-bottom:4px; }
+    .room-price span { font-size:15px; font-weight:400; color:#888; }
+    .room-price .price-note { display:block; font-size:12px; color:#FF385C; font-weight:500; margin-top:2px; }
+
+    /* Calendar */
+    .cal-wrapper { margin-bottom:12px; }
+    .cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .cal-nav button { background:none; border:1px solid #ebebeb; border-radius:8px;
+      width:30px; height:30px; cursor:pointer; font-size:16px; color:#555; transition:background 0.15s; }
+    .cal-nav button:hover { background:#f0f0f0; }
+    .cal-title { font-weight:700; font-size:14px; color:#222; }
+    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+    .cal-header { font-size:10px; font-weight:700; color:#888; text-align:center; padding:3px 0; text-transform:uppercase; }
+    .cal-day {
+      aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+      font-size:12px; border-radius:6px; cursor:pointer; transition:all 0.15s;
+      font-weight:500; position:relative;
+    }
+    .cal-day.empty { cursor:default; }
+    .cal-day.past { color:#ccc; cursor:not-allowed; }
+    .cal-day.booked { background:#ffe0e5; color:#FF385C; cursor:not-allowed; font-weight:700; text-decoration:line-through; }
+    .cal-day.booked::after { content:''; position:absolute; inset:0; border-radius:6px; }
+    .cal-day.available:hover { background:#FF385C; color:#fff; }
+    .cal-day.selected-start, .cal-day.selected-end { background:#FF385C; color:#fff; font-weight:700; }
+    .cal-day.selected-range { background:#ffe0e5; color:#FF385C; }
+    .cal-day.today { border:2px solid #FF385C; }
+
+    .cal-legend { display:flex; gap:12px; font-size:11px; color:#888; margin-top:8px; flex-wrap:wrap; }
+    .cal-legend span { display:flex; align-items:center; gap:4px; }
+    .cal-legend .dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+    .cal-legend .dot-booked { background:#ffe0e5; border:1px solid #FF385C; }
+    .cal-legend .dot-avail { background:#eee; }
+    .cal-legend .dot-sel { background:#FF385C; }
+
+    .cal-selection-info { font-size:13px; color:#555; margin:10px 0; min-height:20px; }
+    .cal-selection-info strong { color:#FF385C; }
+
+    /* Breakfast */
+    .breakfast-section { margin-bottom:14px; padding:12px 14px; background:#fffbf0;
+      border:1px solid #f0e0a0; border-radius:10px; }
+    .breakfast-title { font-size:11px; font-weight:700; text-transform:uppercase;
+      color:#888; letter-spacing:0.5px; margin-bottom:8px; }
+    .breakfast-options { display:flex; gap:8px; }
+    .breakfast-opt { flex:1; padding:8px 6px; border:2px solid #e0d0a0; border-radius:8px;
+      background:#fff; cursor:pointer; text-align:center; font-size:12px; font-weight:600;
+      color:#555; transition:all 0.2s; }
+    .breakfast-opt:hover { border-color:#e0a000; }
+    .breakfast-opt.selected { border-color:#e0a000; background:#fff8e0; color:#b07800; }
+
+    /* Availability badge */
+    .avail-badge { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px;
+      border-radius:20px; margin-left:6px; }
+    .avail-badge.avail { background:#e8f5e9; color:#2e7d32; }
+    .avail-badge.partial { background:#fff3e0; color:#e65100; }
+    .avail-badge.full { background:#ffebee; color:#c62828; }
   </style>
 </head>
 <body>
@@ -185,7 +254,7 @@
   <div class="listing-header">
     <!-- EDIT: Listing title and sister's name -->
     <h1 class="listing-title">
-      Cozy Private Room in Hadar &amp; Udi's House &middot; The Entire Sibling Experience&trade;
+      3 Rooms Available in Hadar &amp; Udi's House &middot; The Entire Greenboim Experience&trade;
     </h1>
     <div class="listing-meta">
       <span class="stars">&#9733; 4.97</span>
@@ -279,6 +348,31 @@
         </div>
       </div>
 
+
+      <!-- BREAKFAST SECTION -->
+      <div class="section">
+        <h2 class="section-title">&#9749; Breakfast</h2>
+        <p>
+          Breakfast is included with every stay at the Greenboim Estate, because Hadar will make it whether you asked or not.
+          There are two options. You will be asked once, and the decision will be made for you anyway.
+        </p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+          <div style="border:2px solid #ebebeb;border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:32px;margin-bottom:8px;">&#127859;</div>
+            <div style="font-weight:700;font-size:16px;margin-bottom:4px;">Fuckerflakes</div>
+            <div style="font-size:13px;color:#666;">The house cereal of uncertain origin. Crunchy at first. Then inexplicably not. A classic.</div>
+          </div>
+          <div style="border:2px solid #ebebeb;border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:32px;margin-bottom:8px;">&#129367;</div>
+            <div style="font-weight:700;font-size:16px;margin-bottom:4px;">Kariot</div>
+            <div style="font-size:13px;color:#666;">Soft. Round. Comforting in ways that are hard to explain. Hadar will add sugar before you can say no.</div>
+          </div>
+        </div>
+        <p style="margin-top:12px;font-size:13px;color:#888;font-style:italic;">
+          Both options are served with whatever mug Udi has already used and rinsed. Coffee is available but requires negotiation.
+        </p>
+      </div>
+
       <!-- HOUSE RULES: EDIT items -->
       <div class="section">
         <h2 class="section-title">House rules</h2>
@@ -308,66 +402,8 @@
 
           <div class="review-card">
             <div class="reviewer-header">
-              <div class="reviewer-avatar" style="background:#e07b4a;">D</div>
-              <div><div class="reviewer-name">Daniel K.</div><div class="reviewer-date">March 2025</div></div>
-            </div>
-            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <p class="review-text">Arrived with one bag, left with a tupperware of leftovers and a small identity crisis. Host told me my career choices were &ldquo;interesting.&rdquo; Slept like a baby (the towel was damp but it's fine). Would absolutely return, 10/10.</p>
-          </div>
-
-          <div class="review-card">
-            <div class="reviewer-header">
-              <div class="reviewer-avatar" style="background:#5b8a5e;">M</div>
-              <div><div class="reviewer-name">Miriam L.</div><div class="reviewer-date">January 2025</div></div>
-            </div>
-            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <p class="review-text">The cat was listed as an amenity. The cat was NOT an amenity. The cat stared at me for three days and knocked my water off the nightstand. The host said &ldquo;yeah, she does that.&rdquo; Otherwise a delightful stay. The Wi-Fi worked on day two.</p>
-          </div>
-
-          <div class="review-card">
-            <div class="reviewer-header">
-              <div class="reviewer-avatar" style="background:#6b6baf;">A</div>
-              <div><div class="reviewer-name">Avi G.</div><div class="reviewer-date">November 2024</div></div>
-            </div>
-            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
-            <p class="review-text">Four stars only because she changed the Wi-Fi password while I was in the middle of a Zoom call and denied it. Otherwise exceptional. The unsolicited life advice was accurate and I'm now pursuing a different career. Deducting one star on principle.</p>
-          </div>
-
-          <div class="review-card">
-            <div class="reviewer-header">
-              <div class="reviewer-avatar" style="background:#b06b6b;">S</div>
-              <div><div class="reviewer-name">Sasha R.</div><div class="reviewer-date">August 2024</div></div>
-            </div>
-            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <p class="review-text">Showed up unannounced (as instructed by the listing). Host opened the door, sighed deeply, and handed me a pillow. No words were exchanged. By day three we were watching reality TV together and sharing a blanket. Peak hospitality. Will return.</p>
-          </div>
-
-          <div class="review-card">
-            <div class="reviewer-header">
-              <div class="reviewer-avatar" style="background:#4a8f9f;">T</div>
-              <div><div class="reviewer-name">Tamar B.</div><div class="reviewer-date">June 2024</div></div>
-            </div>
-            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <p class="review-text">The kitchen smelled amazing but I was not allowed near it. The host cooked something incredible and then ate it while making eye contact with me. She did eventually give me a plate. I cried. Five stars for the emotional range of this experience alone.</p>
-          </div>
-
-          <div class="review-card">
-            <div class="reviewer-header">
-              <div class="reviewer-avatar" style="background:#7a9f4a;">Y</div>
-              <div><div class="reviewer-name">Yossi F.</div><div class="reviewer-date">April 2024</div></div>
-            </div>
-            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <p class="review-text">Genuinely the most comfortable couch I have ever slept on. Would live there permanently if I were allowed. (I am not allowed. Host made that clear on day five.) Highly recommend the backyard &mdash; great stars, slight smell of BBQ and old memories.</p>
-          </div>
-
-
-          <div class="review-card">
-            <div class="reviewer-header">
               <div class="reviewer-avatar" style="background:#c0392b;">I</div>
-              <div>
-                <div class="reviewer-name">Itai R.</div>
-                <div class="reviewer-date">February 2025</div>
-              </div>
+              <div><div class="reviewer-name">Itai R.</div><div class="reviewer-date">February 2025</div></div>
             </div>
             <div class="review-stars">&#9733;&#9733;&#9734;&#9734;&#9734;</div>
             <p class="review-text">I don't want to say the bathroom was dirty but I found something growing near the drain that I'm pretty sure has its own Latin name by now. Hadar said &ldquo;that's just the grout.&rdquo; It was not the grout. Two stars because the couch was comfortable and the cat ignored me consistently, which I found soothing.</p>
@@ -376,10 +412,7 @@
           <div class="review-card">
             <div class="reviewer-header">
               <div class="reviewer-avatar" style="background:#8e44ad;">P</div>
-              <div>
-                <div class="reviewer-name">Pitzi R.</div>
-                <div class="reviewer-date">December 2024</div>
-              </div>
+              <div><div class="reviewer-name">Pitzi R.</div><div class="reviewer-date">December 2024</div></div>
             </div>
             <div class="review-stars">&#9733;&#9733;&#9733;&#9734;&#9734;</div>
             <p class="review-text">Genuinely could not tell if I was staying in a home or a concert venue. Udi watches TV at a volume that I can only describe as &ldquo;structural.&rdquo; I asked if we could turn it down. He said &ldquo;it's on low.&rdquo; It was not on low. I now own earplugs. I brought them from home. I left them there because I knew I'd need them again.</p>
@@ -388,26 +421,22 @@
           <div class="review-card">
             <div class="reviewer-header">
               <div class="reviewer-avatar" style="background:#27ae60;">O</div>
-              <div>
-                <div class="reviewer-name">Orna F.</div>
-                <div class="reviewer-date">October 2024</div>
-              </div>
+              <div><div class="reviewer-name">Orna F.</div><div class="reviewer-date">October 2024</div></div>
             </div>
             <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <p class="review-text">Absolutely flawless in every way. The house was spotless. The shower was a delight. The TV volume was perfectly calibrated. Hadar is a visionary host and Udi is a gentleman. I slept like royalty on what was clearly a premium mattress. The cat greeted me warmly. I have never had a better stay anywhere in the world. Ten out of five stars. Would move in permanently.</p>
+            <p class="review-text">Absolutely flawless in every way. The house was spotless. Hadar is a visionary host and Udi is a gentleman. The cat greeted me warmly. Ten out of five stars.</p>
           </div>
 
           <div class="review-card">
             <div class="reviewer-header">
               <div class="reviewer-avatar" style="background:#2980b9;">A</div>
-              <div>
-                <div class="reviewer-name">Avi Greenboim</div>
-                <div class="reviewer-date">Every single time</div>
-              </div>
+              <div><div class="reviewer-name">Avi Greenboim</div><div class="reviewer-date">Every single time</div></div>
             </div>
             <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <p class="review-text">Outstanding property. Have visited approximately 34 times without technically booking in advance &mdash; or at all &mdash; and have never once been turned away. Sometimes I arrive at 11pm with a bag. Sometimes just a toothbrush. Once, just a vibe. Hadar sighs. Udi makes tea. The couch is always there. Truly unbeatable last-minute availability. Five stars every time.</p>
+            <p class="review-text">Outstanding property. Have visited approximately 34 times without technically booking in advance &mdash; or at all. Sometimes I arrive at 11pm with a bag. Sometimes just a vibe. Hadar sighs. Udi makes tea. The couch is always there. Five stars every time.</p>
           </div>
+
+        </div>
 
         </div>
       </div>
@@ -415,43 +444,67 @@
     </div>
     <!-- END LEFT COLUMN -->
 
-    <!-- BOOKING CARD -->
+    <!-- BOOKING CARD: ROOM PICKER + REAL CALENDAR -->
     <div class="booking-wrapper">
       <div class="booking-card">
-        <!-- EDIT: price and note -->
-        <div class="booking-price">
+
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#888;letter-spacing:0.5px;margin-bottom:8px;">Choose your room</div>
+        <div class="room-tabs">
+          <button class="room-tab active" onclick="selectRoom('suite',this)">&#127968; Suite<br><span class="avail-badge partial" id="badge-suite">Partial</span></button>
+          <button class="room-tab" onclick="selectRoom('topfloor',this)">&#128704; Top Floor<br><span class="avail-badge avail" id="badge-topfloor">Open</span></button>
+          <button class="room-tab" onclick="selectRoom('kidsroom',this)">&#128762; Kid's Room<br><span class="avail-badge avail" id="badge-kidsroom">Open</span></button>
+        </div>
+
+        <div class="room-info" id="room-info-panel">
+          <strong>&#127968; The Suite</strong> &mdash; Private en-suite bathroom. Queen bed. The fanciest option available in the house, which is a low bar but still.<br>
+          <span style="font-size:12px;color:#888;">Max 2 guests &middot; Own bathroom &middot; &#127985; Garden-adjacent view</span>
+        </div>
+
+        <div class="room-price">
           $0 <span>/ night</span>
           <span class="price-note">+ emotional labor (billed separately)</span>
         </div>
-        <div class="booking-rating">&#9733; 4.97 &middot; <span style="text-decoration:underline; cursor:pointer;">312 reviews</span></div>
-        <div class="date-grid">
-          <div class="date-field">
-            <div class="date-label">Check-in</div>
-            <!-- EDIT: check-in / checkout display text -->
-            <div class="date-value">Whenever</div>
+        <div class="booking-rating">&#9733; 4.97 &middot; <span style="text-decoration:underline;cursor:pointer;">4 reviews</span></div>
+
+        <div class="cal-wrapper">
+          <div class="cal-nav">
+            <button onclick="calPrev()">&#8592;</button>
+            <div class="cal-title" id="cal-title"></div>
+            <button onclick="calNext()">&#8594;</button>
           </div>
-          <div class="date-field">
-            <div class="date-label">Checkout</div>
-            <div class="date-value">She'll tell you</div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <div class="cal-legend">
+            <span><span class="dot dot-booked"></span> Booked</span>
+            <span><span class="dot dot-avail"></span> Available</span>
+            <span><span class="dot dot-sel"></span> Your stay</span>
           </div>
         </div>
-        <div class="guests-field">
-          <div class="guests-label">Guests</div>
-          <div class="guests-value">1 sibling (no plus ones)</div>
+
+        <div class="cal-selection-info" id="cal-selection-info">Select check-in date &#8595;</div>
+
+        <div class="breakfast-section">
+          <div class="breakfast-title">&#9749; Breakfast (included, obviously)</div>
+          <div class="breakfast-options">
+            <div class="breakfast-opt selected" id="bfast-fuckerflakes" onclick="selectBreakfast('fuckerflakes')">
+              &#127859; <strong>Fuckerflakes</strong><br><span style="font-size:10px;color:#888;">Classic. Divisive.</span>
+            </div>
+            <div class="breakfast-opt" id="bfast-kariot" onclick="selectBreakfast('kariot')">
+              &#129367; <strong>Kariot</strong><br><span style="font-size:10px;color:#888;">Soft. Comforting.</span>
+            </div>
+          </div>
         </div>
-        <!-- EDIT: Reserve button text -->
-        <button class="reserve-btn" onclick="showModal()">Reserve (It's Free, Technically)</button>
+
+        <button class="reserve-btn" onclick="tryReserve()">Reserve (It's Free, Technically)</button>
         <p class="booking-note">You won't be charged &mdash; but you will owe her one.</p>
-        <!-- EDIT: price breakdown rows -->
+
         <div class="price-breakdown">
-          <div class="price-row"><span>$0 &times; 3 nights</span><span>$0</span></div>
+          <div class="price-row"><span id="nights-label">Select dates to see total</span><span id="nights-price">&mdash;</span></div>
           <div class="price-row"><span>Guilt fee</span><span>$0</span></div>
-          <div class="price-row"><span>Sibling discount</span><span>-$0</span></div>
-          <div class="price-row total"><span>Total</span><span>$0 + feelings</span></div>
+          <div class="price-row total"><span>Total</span><span id="total-price">$0 + feelings</span></div>
         </div>
+
       </div>
     </div>
-
   </div>
 </div>
 
@@ -466,10 +519,11 @@
     <div class="modal-emoji">&#127968;</div>
     <div class="modal-title">Booking Request Sent!</div>
     <p class="modal-msg">
-      Hadar has <strong>30 days</strong> to pretend she didn't see this, and Udi has 30 more days to pretend he lost the Wi-Fi password.<br><br>
-      In the meantime, we suggest packing light (she has no extra hangers),
-      bringing your own snacks (she'll eat them), and preparing a short speech
-      about why you've made good life choices.
+      <strong id="modal-room-name">The Suite</strong><br>
+      <span id="modal-dates" style="color:#555;font-size:14px;"></span><br>
+      Breakfast: <strong id="modal-breakfast">Fuckerflakes</strong><br><br>
+      Hadar has <strong>30 days</strong> to pretend she didn't see this, and Udi has 30 more days to pretend he lost the Wi-Fi password.
+      Pack light, bring your own snacks, and prepare a short speech about why you've made good life choices.
     </p>
     <button class="modal-close" onclick="closeModal()">Got it, I'll show up anyway</button>
     <p class="modal-fine-print">No actual booking was made. Hadar &amp; Udi are not legally responsible for this stay.</p>
@@ -477,7 +531,253 @@
 </div>
 
 <script>
+  // ============================================================
+  // ROOM DATA & BOOKED DATES
+  // ============================================================
+  var ROOMS = {
+    suite: {
+      name: '&#127968; The Suite',
+      desc: 'Private en-suite bathroom. Queen bed. The fanciest option in the house &mdash; which is a low bar, but still.',
+      sub: 'Max 2 guests &middot; Own bathroom &middot; &#127985; Garden-adjacent view',
+      price: '$0 / night + feelings',
+      // Pre-blocked: Pitzi R. Jun 29 – Jul 9 2026
+      booked: [
+        { name: 'Pitzi R.', from: '2026-06-29', to: '2026-07-09' }
+      ]
+    },
+    topfloor: {
+      name: '&#128704; Top Floor Room',
+      desc: 'Cozy room on the top floor. Real bed. Shared bathroom with other guests &mdash; and whoever else Hadar has let in.',
+      sub: '1–2 guests &middot; Shared bathroom &middot; &#127774; Natural light (probably)',
+      price: '$0 / night + feelings',
+      booked: []
+    },
+    kidsroom: {
+      name: '&#128762; Kid's Room',
+      desc: 'Double bed. You share it with a child. The child was not consulted about this arrangement and has strong opinions about the middle of the bed.',
+      sub: '1 adult guest (child included) &middot; Shared bathroom &middot; &#127918; Toys will be underfoot',
+      price: '$0 / night + feelings',
+      booked: []
+    }
+  };
 
+  var currentRoom = 'suite';
+  var calYear, calMonth;
+  var selStart = null, selEnd = null;
+  var selectedBreakfast = 'fuckerflakes';
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  window.addEventListener('DOMContentLoaded', function() {
+    var now = new Date();
+    calYear = now.getFullYear();
+    calMonth = now.getMonth();
+    renderCal();
+    updateBadges();
+  });
+
+  // ============================================================
+  // ROOM SELECTION
+  // ============================================================
+  function selectRoom(roomKey, btn) {
+    currentRoom = roomKey;
+    selStart = null; selEnd = null;
+    // Update tabs
+    document.querySelectorAll('.room-tab').forEach(function(t) { t.classList.remove('active'); });
+    btn.classList.add('active');
+    // Update info panel
+    var r = ROOMS[roomKey];
+    document.getElementById('room-info-panel').innerHTML =
+      '<strong>' + r.name + '</strong> &mdash; ' + r.desc +
+      '<br><span style="font-size:12px;color:#888;">' + r.sub + '</span>';
+    // Reset selection info
+    document.getElementById('cal-selection-info').innerHTML = 'Select check-in date &#8595;';
+    document.getElementById('nights-label').textContent = 'Select dates to see total';
+    document.getElementById('nights-price').textContent = '—';
+    document.getElementById('total-price').textContent = '$0 + feelings';
+    renderCal();
+  }
+
+  // ============================================================
+  // CALENDAR
+  // ============================================================
+  function dateStr(y, m, d) {
+    return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+  }
+
+  function parseDate(s) { var p=s.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+
+  function isBooked(y, m, d) {
+    var ds = dateStr(y, m, d);
+    var dt = parseDate(ds);
+    var room = ROOMS[currentRoom];
+    for (var i=0; i<room.booked.length; i++) {
+      var f = parseDate(room.booked[i].from);
+      var t = parseDate(room.booked[i].to);
+      if (dt >= f && dt <= t) return room.booked[i].name || true;
+    }
+    return false;
+  }
+
+  function isInRange(y, m, d) {
+    if (!selStart || !selEnd) return false;
+    var dt = parseDate(dateStr(y, m, d));
+    var s = parseDate(selStart), e = parseDate(selEnd);
+    return dt > s && dt < e;
+  }
+
+  function calPrev() {
+    calMonth--;
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCal();
+  }
+  function calNext() {
+    calMonth++;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCal();
+  }
+
+  function renderCal() {
+    var months = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+    document.getElementById('cal-title').textContent = months[calMonth] + ' ' + calYear;
+    var grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+    var days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    days.forEach(function(d) {
+      var h = document.createElement('div');
+      h.className = 'cal-header'; h.textContent = d; grid.appendChild(h);
+    });
+    var firstDay = new Date(calYear, calMonth, 1).getDay();
+    var daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+    var today = new Date(); today.setHours(0,0,0,0);
+    for (var i=0; i<firstDay; i++) {
+      var empty = document.createElement('div');
+      empty.className = 'cal-day empty'; grid.appendChild(empty);
+    }
+    for (var d=1; d<=daysInMonth; d++) {
+      var cell = document.createElement('div');
+      cell.className = 'cal-day';
+      cell.textContent = d;
+      var dt = new Date(calYear, calMonth, d);
+      var ds = dateStr(calYear, calMonth, d);
+      var bookedBy = isBooked(calYear, calMonth, d);
+      if (dt < today) {
+        cell.classList.add('past');
+        cell.title = 'Past date';
+      } else if (bookedBy) {
+        cell.classList.add('booked');
+        cell.title = 'Booked' + (typeof bookedBy === 'string' ? ' by ' + bookedBy : '');
+      } else {
+        cell.classList.add('available');
+        if (ds === selStart) cell.classList.add('selected-start');
+        else if (ds === selEnd) cell.classList.add('selected-end');
+        else if (isInRange(calYear, calMonth, d)) cell.classList.add('selected-range');
+        (function(year, month, day, dateS) {
+          cell.onclick = function() { handleDayClick(year, month, day, dateS); };
+        })(calYear, calMonth, d, ds);
+      }
+      var todayStr = dateStr(today.getFullYear(), today.getMonth(), today.getDate());
+      if (ds === todayStr && !bookedBy) cell.classList.add('today');
+      grid.appendChild(cell);
+    }
+  }
+
+  function handleDayClick(y, m, d, ds) {
+    if (!selStart || (selStart && selEnd)) {
+      selStart = ds; selEnd = null;
+      document.getElementById('cal-selection-info').innerHTML =
+        'Check-in: <strong>' + formatDate(ds) + '</strong> &mdash; now select check-out &#8595;';
+    } else {
+      if (ds <= selStart) { selStart = ds; selEnd = null;
+        document.getElementById('cal-selection-info').innerHTML =
+          'Check-in: <strong>' + formatDate(ds) + '</strong> &mdash; now select check-out &#8595;';
+      } else {
+        // Check no booked dates in range
+        var s = parseDate(selStart), e = parseDate(ds);
+        var blocked = false;
+        var room = ROOMS[currentRoom];
+        for (var i=0; i<room.booked.length; i++) {
+          var bf = parseDate(room.booked[i].from);
+          var bt = parseDate(room.booked[i].to);
+          if (!(e <= bf || s >= bt)) { blocked = true; break; }
+        }
+        if (blocked) {
+          document.getElementById('cal-selection-info').innerHTML =
+            '<span style="color:#FF385C;">&#9888; Your range overlaps a booked period. Pick different dates.</span>';
+          selStart = null; selEnd = null;
+        } else {
+          selEnd = ds;
+          var nights = Math.round((parseDate(selEnd)-parseDate(selStart))/(1000*60*60*24));
+          document.getElementById('cal-selection-info').innerHTML =
+            'Check-in: <strong>' + formatDate(selStart) + '</strong> &rarr; Check-out: <strong>' + formatDate(selEnd) + '</strong><br>' +
+            '<span style="color:#27ae60;font-weight:600;">' + nights + ' night' + (nights===1?'':'s') + ' &mdash; Available! &#10003;</span>';
+          document.getElementById('nights-label').textContent = '$0 × ' + nights + ' night' + (nights===1?'':'s');
+          document.getElementById('nights-price').textContent = '$0';
+          document.getElementById('total-price').textContent = '$0 + ' + nights + '×feelings';
+        }
+      }
+    }
+    renderCal();
+  }
+
+  function formatDate(s) {
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var p = s.split('-');
+    return months[+p[1]-1] + ' ' + +p[2] + ', ' + p[0];
+  }
+
+  // ============================================================
+  // BADGES
+  // ============================================================
+  function updateBadges() {
+    Object.keys(ROOMS).forEach(function(key) {
+      var badge = document.getElementById('badge-' + key);
+      if (!badge) return;
+      var booked = ROOMS[key].booked;
+      if (booked.length === 0) {
+        badge.textContent = 'Open'; badge.className = 'avail-badge avail';
+      } else {
+        badge.textContent = 'Partial'; badge.className = 'avail-badge partial';
+      }
+    });
+  }
+
+  // ============================================================
+  // BREAKFAST
+  // ============================================================
+  function selectBreakfast(choice) {
+    selectedBreakfast = choice;
+    document.getElementById('bfast-fuckerflakes').classList.toggle('selected', choice === 'fuckerflakes');
+    document.getElementById('bfast-kariot').classList.toggle('selected', choice === 'kariot');
+  }
+
+  // ============================================================
+  // RESERVE
+  // ============================================================
+  function tryReserve() {
+    if (!selStart || !selEnd) {
+      document.getElementById('cal-selection-info').innerHTML =
+        '<span style="color:#FF385C;">&#9888; Please select check-in and check-out dates first!</span>';
+      return;
+    }
+    var nights = Math.round((parseDate(selEnd)-parseDate(selStart))/(1000*60*60*24));
+    var rName = ROOMS[currentRoom].name.replace(/&#[0-9]+;/g,'').trim();
+    document.getElementById('modal-room-name').textContent = rName;
+    document.getElementById('modal-dates').textContent = formatDate(selStart) + ' → ' + formatDate(selEnd) + ' (' + nights + ' night' + (nights===1?'':'s') + ')';
+    document.getElementById('modal-breakfast').textContent = selectedBreakfast === 'fuckerflakes' ? 'Fuckerflakes' : 'Kariot';
+    showModal();
+    // Add to booked (client-side only, resets on refresh)
+    ROOMS[currentRoom].booked.push({ name: 'You', from: selStart, to: selEnd });
+    updateBadges();
+    selStart = null; selEnd = null;
+    renderCal();
+  }
+
+  // ============================================================
+  // SPLASH / MODAL
+  // ============================================================
   function dismissSplash() {
     var s = document.getElementById('splash');
     s.classList.add('hidden');
@@ -500,5 +800,6 @@
 
 </body>
 </html>
+
 
 
