@@ -628,11 +628,11 @@
   //   3. Project Settings → API → copy "Project URL" + "anon public"
   //   4. Paste them here and re-deploy
   // ============================================================
-  var SUPABASE_URL = 'YOUR_SUPABASE_URL';
-  var SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+  var SUPABASE_URL = 'https://aioduawiknbwtnehpizl.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpb2R1YXdpa25id3RuZWhwaXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MzEyNjUsImV4cCI6MjA5NzIwNzI2NX0.2GA1sAC05iahjx4Y8q7X-tqBQNcOeKJGrhzlG6h2eVo';
 
   var sb = null;
-  if (SUPABASE_URL.indexOf('YOUR_') === -1 && window.supabase) {
+  if (SUPABASE_URL.indexOf('YOUR_') === -1 && SUPABASE_ANON_KEY.indexOf('YOUR_') === -1 && window.supabase) {
     try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch (e) { sb = null; }
   }
 
