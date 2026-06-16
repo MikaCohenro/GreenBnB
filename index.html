@@ -106,7 +106,7 @@
     footer strong { color: #FF385C; }
     @media (max-width: 900px) {
       .content-area { grid-template-columns: 1fr; gap: 0; }
-      .booking-wrapper { position: static; padding: 28px 0; }
+      .booking-wrapper { position: static; padding: 0 0 28px; order: -1; }
       .reviews-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 640px) {
@@ -170,18 +170,18 @@
     .room-price span { font-size:15px; font-weight:400; color:#888; }
     .room-price .price-note { display:block; font-size:12px; color:#FF385C; font-weight:500; margin-top:2px; }
 
-    /* Calendar */
-    .cal-wrapper { margin-bottom:12px; }
-    .cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-    .cal-nav button { background:none; border:1px solid #ebebeb; border-radius:8px;
-      width:30px; height:30px; cursor:pointer; font-size:16px; color:#555; transition:background 0.15s; }
+    /* Calendar — compact */
+    .cal-wrapper { margin:0 auto 10px; max-width:230px; }
+    .cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+    .cal-nav button { background:none; border:1px solid #ebebeb; border-radius:6px;
+      width:24px; height:24px; cursor:pointer; font-size:13px; color:#555; transition:background 0.15s; }
     .cal-nav button:hover { background:#f0f0f0; }
-    .cal-title { font-weight:700; font-size:14px; color:#222; }
-    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
-    .cal-header { font-size:10px; font-weight:700; color:#888; text-align:center; padding:3px 0; text-transform:uppercase; }
+    .cal-title { font-weight:700; font-size:12px; color:#222; }
+    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+    .cal-header { font-size:8px; font-weight:700; color:#888; text-align:center; padding:1px 0; text-transform:uppercase; }
     .cal-day {
       aspect-ratio:1; display:flex; align-items:center; justify-content:center;
-      font-size:12px; border-radius:6px; cursor:pointer; transition:all 0.15s;
+      font-size:10px; border-radius:4px; cursor:pointer; transition:all 0.15s;
       font-weight:500; position:relative;
     }
     .cal-day.empty { cursor:default; }
@@ -299,7 +299,7 @@
       <!-- DESCRIPTION: EDIT this paragraph -->
       <div class="section">
         <h2 class="section-title">About this place</h2>
-        <p>Welcome to the legendary Greenboim Estate &mdash; a one-of-a-kind property nestled somewhere between &ldquo;guest room&rdquo; and &ldquo;just sit anywhere, there's room on the couch.&rdquo; Your host, Hadar, is a seasoned Superhost who has been involuntarily hosting siblings, cousins, and the occasional stray friend since approximately 1997. The vibe is <em>cozy-chaotic</em>: you'll be treated like family (because you are), which means you'll be offered snacks, then immediately judged for which ones you chose. The room comes fully furnished with Hadar's unsolicited opinions and a duvet she's not sure is clean. Minimum stay: however long it takes her to subtly suggest you should really be getting home.</p>
+        <p>Welcome to the legendary Greenboim Estate &mdash; a one-of-a-kind property nestled somewhere between &ldquo;guest room&rdquo; and &ldquo;just sit anywhere, there's room on the couch.&rdquo; Your host, Hadar, is a seasoned Superhost who has been involuntarily hosting siblings, cousins, and the occasional stray friend since approximately 1997. The vibe is <em>cozy-chaotic</em>: you'll be treated like family (because you are), which means you'll be offered snacks, then immediately judged for which ones you chose. The room comes fully furnished with Hadar's unsolicited opinions and a duvet of uncertain cleanliness. Minimum stay: however long it takes before the gentle hints about heading home begin.</p>
       </div>
 
       <!-- AMENITIES: EDIT items -->
@@ -307,12 +307,12 @@
         <h2 class="section-title">What this place offers</h2>
         <div class="amenities-grid">
           <div class="amenity-item"><span class="amenity-icon">&#128483;</span> Unsolicited life advice</div>
-          <div class="amenity-item"><span class="amenity-icon">&#128246;</span> Wi-Fi (password changes weekly, she won't tell you)</div>
+          <div class="amenity-item"><span class="amenity-icon">&#128246;</span> Wi-Fi (technically. It's always bad and doesn't work anyway)</div>
           <div class="amenity-item"><span class="amenity-icon">&#129488;</span> Free judgment (24/7)</div>
           <div class="amenity-item"><span class="amenity-icon">&#128705;</span> Hot water (intermittent)</div>
           <div class="amenity-item"><span class="amenity-icon">&#127987;</span> 1 (one) clean towel</div>
-          <div class="amenity-item"><span class="amenity-icon">&#128049;</span> Cat who will ignore you</div>
-          <div class="amenity-item"><span class="amenity-icon">&#128250;</span> TV (she controls the remote)</div>
+          <div class="amenity-item"><span class="amenity-icon">&#128021;</span> Chase from Paw Patrol who will ignore you</div>
+          <div class="amenity-item"><span class="amenity-icon">&#128250;</span> TV (remote not included)</div>
           <div class="amenity-item"><span class="amenity-icon">&#129474;</span> Fully stocked spice rack (do not touch)</div>
           <div class="amenity-item"><span class="amenity-icon">&#128716;</span> Pillow (singular)</div>
           <div class="amenity-item"><span class="amenity-icon">&#127796;</span> Plants that judge you silently</div>
@@ -353,7 +353,7 @@
       <div class="section">
         <h2 class="section-title">&#9749; Breakfast</h2>
         <p>
-          Breakfast is included with every stay at the Greenboim Estate, because Hadar will make it whether you asked or not.
+          Breakfast is included with every stay at the Greenboim Estate.
           There are two options. You will be asked once, and the decision will be made for you anyway.
         </p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
@@ -377,13 +377,13 @@
       <div class="section">
         <h2 class="section-title">House rules</h2>
         <ul class="rules-list">
-          <li><span class="rule-icon">&#127769;</span> Quiet hours: whenever she's napping (so, basically always)</li>
+          <li><span class="rule-icon">&#127769;</span> Quiet time after 8:30 PM &mdash; for everyone.</li>
           <li><span class="rule-icon">&#127777;</span> No touching the thermostat. Not even to look at it.</li>
           <li><span class="rule-icon">&#129381;</span> Replace anything you eat, or perish.</li>
-          <li><span class="rule-icon">&#128701;</span> The bathroom schedule is negotiable, but she'll win.</li>
-          <li><span class="rule-icon">&#127925;</span> No music after 9 PM unless it's her playlist.</li>
+          <li><span class="rule-icon">&#128701;</span> The bathroom schedule is negotiable.</li>
+          <li><span class="rule-icon">&#128118;</span> On weekends you will be asked to host a kid in bed with you.</li>
           <li><span class="rule-icon">&#129529;</span> You will help clean up. This is not a request.</li>
-          <li><span class="rule-icon">&#128245;</span> You may not leave negative reviews. She will find out.</li>
+          <li><span class="rule-icon">&#128245;</span> You may not leave negative reviews.</li>
           <li><span class="rule-icon">&#128172;</span> No calling Mom unless host has approved the narrative first.</li>
         </ul>
       </div>
@@ -406,7 +406,7 @@
               <div><div class="reviewer-name">Itai R.</div><div class="reviewer-date">February 2025</div></div>
             </div>
             <div class="review-stars">&#9733;&#9733;&#9734;&#9734;&#9734;</div>
-            <p class="review-text">I don't want to say the bathroom was dirty but I found something growing near the drain that I'm pretty sure has its own Latin name by now. Hadar said &ldquo;that's just the grout.&rdquo; It was not the grout. Two stars because the couch was comfortable and the cat ignored me consistently, which I found soothing.</p>
+            <p class="review-text">I don't want to say the bathroom was dirty but I found something growing near the drain that I'm pretty sure has its own Latin name by now. Hadar said &ldquo;that's just the grout.&rdquo; It was not the grout. Two stars because the couch was comfortable and Chase from Paw Patrol ignored me consistently, which I found soothing.</p>
           </div>
 
           <div class="review-card">
@@ -424,7 +424,7 @@
               <div><div class="reviewer-name">Orna F.</div><div class="reviewer-date">October 2024</div></div>
             </div>
             <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <p class="review-text">Absolutely flawless in every way. The house was spotless. Hadar is a visionary host and Udi is a gentleman. The cat greeted me warmly. Ten out of five stars.</p>
+            <p class="review-text">Absolutely flawless in every way. The house was spotless. Hadar is a visionary host and Udi is a gentleman. Marshall from Paw Patrol greeted me warmly. Ten out of five stars.</p>
           </div>
 
           <div class="review-card">
@@ -495,7 +495,7 @@
         </div>
 
         <button class="reserve-btn" onclick="tryReserve()">Reserve (It's Free, Technically)</button>
-        <p class="booking-note">You won't be charged &mdash; but you will owe her one.</p>
+        <p class="booking-note">You won't be charged &mdash; but you will owe the hosts one.</p>
 
         <div class="price-breakdown">
           <div class="price-row"><span id="nights-label">Select dates to see total</span><span id="nights-price">&mdash;</span></div>
@@ -522,7 +522,7 @@
       <strong id="modal-room-name">The Suite</strong><br>
       <span id="modal-dates" style="color:#555;font-size:14px;"></span><br>
       Breakfast: <strong id="modal-breakfast">Fuckerflakes</strong><br><br>
-      Hadar has <strong>30 days</strong> to pretend she didn't see this, and Udi has 30 more days to pretend he lost the Wi-Fi password.
+      Hadar has <strong>30 days</strong> to pretend the request was never received, and Udi has 30 more days to pretend he lost the Wi-Fi password.
       Pack light, bring your own snacks, and prepare a short speech about why you've made good life choices.
     </p>
     <button class="modal-close" onclick="closeModal()">Got it, I'll show up anyway</button>
