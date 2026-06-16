@@ -194,7 +194,7 @@
     }
     .cal-day.empty { cursor:default; }
     .cal-day.past { color:#ccc; cursor:not-allowed; }
-    .cal-day.booked { background:#ffe0e5; color:#FF385C; cursor:not-allowed; font-weight:700; text-decoration:line-through; }
+    .cal-day.booked { background:#ffe0e5; color:#FF385C; cursor:pointer; font-weight:700; text-decoration:line-through; }
     .cal-day.booked::after { content:''; position:absolute; inset:0; border-radius:6px; }
     .cal-day.available:hover { background:#FF385C; color:#fff; }
     .cal-day.selected-start, .cal-day.selected-end { background:#FF385C; color:#fff; font-weight:700; }
@@ -834,6 +834,25 @@
     return false;
   }
 
+  function getBooking(y, m, d) {
+    var dt = parseDate(dateStr(y, m, d));
+    var room = ROOMS[currentRoom];
+    for (var i=0; i<room.booked.length; i++) {
+      if (dt >= parseDate(room.booked[i].from) && dt <= parseDate(room.booked[i].to)) return room.booked[i];
+    }
+    return null;
+  }
+
+  // Tap a booked day (works on mobile where hover/title doesn't) to reveal who booked it
+  function showBookingInfo(y, m, d) {
+    var b = getBooking(y, m, d);
+    if (!b) return;
+    var who = b.guests ? (' &middot; ' + b.guests + ' guest' + (b.guests===1?'':'s')) : '';
+    document.getElementById('cal-selection-info').innerHTML =
+      '<span style="color:#FF385C;">&#128197; Booked by <strong>' + escapeHtml(b.name || 'a guest') + '</strong>' + who +
+      '</span><br><span style="font-size:11px;color:#888;">' + formatDate(b.from) + ' &rarr; ' + formatDate(b.to) + '</span>';
+  }
+
   function isInRange(y, m, d) {
     if (!selStart || !selEnd) return false;
     var dt = parseDate(dateStr(y, m, d));
@@ -882,7 +901,10 @@
         cell.title = 'Past date';
       } else if (bookedBy) {
         cell.classList.add('booked');
-        cell.title = 'Booked' + (typeof bookedBy === 'string' ? ' by ' + bookedBy : '');
+        cell.title = 'Booked' + (typeof bookedBy === 'string' ? ' by ' + bookedBy : '') + ' — tap for details';
+        (function(year, month, day) {
+          cell.onclick = function() { showBookingInfo(year, month, day); };
+        })(calYear, calMonth, d);
       } else {
         cell.classList.add('available');
         if (ds === selStart) cell.classList.add('selected-start');
