@@ -611,7 +611,31 @@
   </div>
 </div>
 
+<!-- Supabase client (shared reservations backend) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // ============================================================
+  // SUPABASE CONFIG
+  // ------------------------------------------------------------
+  // Paste your project URL + anon (public) key below to enable
+  // SHARED reservations (everyone sees the same bookings, on any
+  // device). Until then, the site falls back to per-browser
+  // localStorage automatically.
+  //
+  // Setup (one time, ~3 min):
+  //   1. Create a free project at https://supabase.com
+  //   2. SQL editor → run the CREATE TABLE block from README/below
+  //   3. Project Settings → API → copy "Project URL" + "anon public"
+  //   4. Paste them here and re-deploy
+  // ============================================================
+  var SUPABASE_URL = 'YOUR_SUPABASE_URL';
+  var SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+  var sb = null;
+  if (SUPABASE_URL.indexOf('YOUR_') === -1 && window.supabase) {
+    try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch (e) { sb = null; }
+  }
+
   // ============================================================
   // ROOM DATA & BOOKED DATES
   // ============================================================
@@ -647,6 +671,24 @@
   var selStart = null, selEnd = null;
   var selectedBreakfast = 'fuckerflakes';
 
+  // Snapshot the hardcoded/seeded bookings so a DB refresh can rebuild cleanly
+  var SEEDED = {};
+  Object.keys(ROOMS).forEach(function(key) {
+    SEEDED[key] = ROOMS[key].booked.map(function(b) { return Object.assign({}, b); });
+  });
+
+  // Track which reservation ids THIS browser created, so "Your reservations"
+  // (cancellable) shows only your own even when the data is shared.
+  var MINE_KEY = 'greenbnb_my_ids_v1';
+  var myIds = loadMyIds();
+  function loadMyIds() {
+    try { return new Set(JSON.parse(localStorage.getItem(MINE_KEY) || '[]')); }
+    catch (e) { return new Set(); }
+  }
+  function saveMyIds() {
+    try { localStorage.setItem(MINE_KEY, JSON.stringify(Array.from(myIds))); } catch (e) {}
+  }
+
   // ============================================================
   // INIT
   // ============================================================
@@ -654,36 +696,98 @@
     var now = new Date();
     calYear = now.getFullYear();
     calMonth = now.getMonth();
-    loadReservations();
-    renderCal();
-    updateBadges();
-    renderMyReservations();
+    refreshReservations();
   });
 
   // ============================================================
-  // PERSISTENCE (localStorage — survives refresh/restart, per-browser)
+  // DATA LAYER — Supabase (shared) with localStorage fallback
   // ============================================================
   var STORAGE_KEY = 'greenbnb_reservations_v1';
 
-  function saveReservations() {
-    var data = {};
+  // Rebuild every room's booked list = seeded baseline + saved/shared rows
+  function rebuildBooked(rows) {
     Object.keys(ROOMS).forEach(function(key) {
-      data[key] = ROOMS[key].booked.filter(function(b) { return b.mine; });
+      ROOMS[key].booked = SEEDED[key].map(function(b) { return Object.assign({}, b); });
     });
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
-  }
-
-  function loadReservations() {
-    var raw;
-    try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { return; }
-    if (!raw) return;
-    var data;
-    try { data = JSON.parse(raw); } catch (e) { return; }
-    Object.keys(ROOMS).forEach(function(key) {
-      if (Array.isArray(data[key])) {
-        data[key].forEach(function(b) { b.mine = true; ROOMS[key].booked.push(b); });
+    rows.forEach(function(r) {
+      if (ROOMS[r.room]) {
+        ROOMS[r.room].booked.push({
+          id: r.id, name: r.name, guests: r.guests,
+          from: r.from, to: r.to, mine: myIds.has(r.id)
+        });
       }
     });
+  }
+
+  function renderAll() {
+    updateBadges();
+    renderCal();
+    renderMyReservations();
+    renderHostView();
+  }
+
+  function refreshReservations() {
+    if (sb) {
+      sb.from('reservations').select('*').then(function(res) {
+        if (res.error) { console.warn('Supabase load failed, using local cache:', res.error.message); loadLocal(); renderAll(); return; }
+        var rows = (res.data || []).map(function(d) {
+          return { id: d.id, room: d.room, name: d.name, guests: d.guests, from: d.check_in, to: d.check_out };
+        });
+        rebuildBooked(rows);
+        renderAll();
+      });
+    } else {
+      loadLocal();
+      renderAll();
+    }
+  }
+
+  // ---- localStorage fallback (per-browser) ----
+  function saveLocal() {
+    var rows = [];
+    Object.keys(ROOMS).forEach(function(key) {
+      ROOMS[key].booked.filter(function(b) { return b.mine; }).forEach(function(b) {
+        rows.push({ id: b.id, room: key, name: b.name, guests: b.guests, from: b.from, to: b.to });
+      });
+    });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(rows)); } catch (e) {}
+  }
+  function loadLocal() {
+    var rows = [];
+    try { rows = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch (e) { rows = []; }
+    if (!Array.isArray(rows)) rows = [];
+    rebuildBooked(rows);
+  }
+
+  // ---- create / delete (Supabase or local) ----
+  function persistCreate(room, res) {
+    if (sb) {
+      sb.from('reservations').insert({
+        room: room, name: res.name, guests: res.guests, check_in: res.from, check_out: res.to
+      }).select().single().then(function(out) {
+        if (out.error) { console.warn('Supabase insert failed:', out.error.message); return; }
+        // Replace the temp id with the real DB id and mark as mine
+        myIds.delete(res.id);
+        myIds.add(out.data.id);
+        saveMyIds();
+        refreshReservations();
+      });
+    } else {
+      saveLocal();
+      renderAll();
+    }
+  }
+  function persistDelete(id) {
+    if (sb) {
+      sb.from('reservations').delete().eq('id', id).then(function(out) {
+        if (out.error) { console.warn('Supabase delete failed:', out.error.message); return; }
+        myIds.delete(id); saveMyIds();
+        refreshReservations();
+      });
+    } else {
+      saveLocal();
+      renderAll();
+    }
   }
 
   // ============================================================
@@ -899,16 +1003,15 @@
     document.getElementById('modal-guests').textContent = guests + ' guest' + (guests===1?'':'s');
     document.getElementById('modal-breakfast').textContent = selectedBreakfast === 'fuckerflakes' ? 'Fuckerflakes' : 'Kariot';
     showModal();
-    // Add to booked (client-side only, resets on refresh)
-    ROOMS[currentRoom].booked.push({ id: Date.now(), name: resName, guests: guests, from: selStart, to: selEnd, mine: true });
-    saveReservations();
-    updateBadges();
+    // Optimistic add (temp id); persistCreate syncs to the backend
+    var tempId = Date.now();
+    ROOMS[currentRoom].booked.push({ id: tempId, name: resName, guests: guests, from: selStart, to: selEnd, mine: true });
+    myIds.add(tempId); saveMyIds();
     selStart = null; selEnd = null;
     document.getElementById('res-name').value = '';
     document.getElementById('res-guests').value = '1';
-    renderCal();
-    renderMyReservations();
-    renderHostView();
+    renderAll();
+    persistCreate(currentRoom, { id: tempId, name: resName, guests: guests, from: selStart, to: selEnd });
   }
 
   // ============================================================
@@ -934,11 +1037,9 @@
   function cancelReservation(id) {
     var room = ROOMS[currentRoom];
     room.booked = room.booked.filter(function(b) { return b.id !== id; });
-    saveReservations();
-    updateBadges();
-    renderCal();
-    renderMyReservations();
-    renderHostView();
+    myIds.delete(id); saveMyIds();
+    renderAll();
+    persistDelete(id);
   }
 
   function escapeHtml(s) {
