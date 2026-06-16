@@ -223,6 +223,35 @@
     .breakfast-opt:hover { border-color:#e0a000; }
     .breakfast-opt.selected { border-color:#e0a000; background:#fff8e0; color:#b07800; }
 
+    /* Guest form: reservation name + guest count */
+    .guest-form { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+    .guest-field { border:1px solid #b0b0b0; border-radius:9px; padding:7px 10px; }
+    .guest-flabel { display:block; font-size:9px; font-weight:700; text-transform:uppercase;
+      color:#555; letter-spacing:0.5px; margin-bottom:2px; }
+    .guest-input { width:100%; border:none; outline:none; font-size:13px; color:#222;
+      background:transparent; font-family:inherit; }
+    .guest-field-count { display:flex; align-items:center; justify-content:space-between; }
+    .stepper { display:flex; align-items:center; gap:8px; }
+    .stepper-btn { width:24px; height:24px; border:1px solid #b0b0b0; border-radius:50%;
+      background:#fff; cursor:pointer; font-size:15px; line-height:1; color:#444; flex-shrink:0; }
+    .stepper-btn:hover { border-color:#FF385C; color:#FF385C; }
+    .stepper-input { width:34px; text-align:center; font-weight:600; -moz-appearance:textfield; }
+    .stepper-input::-webkit-outer-spin-button, .stepper-input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+
+    /* My reservations list */
+    .my-reservations:not(:empty) { margin-top:14px; border-top:1px solid #ebebeb; padding-top:12px; }
+    .my-res-title { font-size:10px; font-weight:700; text-transform:uppercase; color:#888;
+      letter-spacing:0.5px; margin-bottom:8px; }
+    .res-item { display:flex; align-items:center; justify-content:space-between; gap:8px;
+      background:#f9f9f9; border-radius:8px; padding:8px 10px; margin-bottom:6px; }
+    .res-info { font-size:12px; color:#333; line-height:1.4; }
+    .res-info strong { color:#222; }
+    .res-info .res-dates { color:#888; font-size:11px; }
+    .res-cancel { flex-shrink:0; background:#fff; border:1px solid #FF385C; color:#FF385C;
+      border-radius:7px; padding:5px 10px; font-size:11px; font-weight:600; cursor:pointer;
+      transition:all 0.15s; font-family:inherit; }
+    .res-cancel:hover { background:#FF385C; color:#fff; }
+
     /* Availability badge */
     .avail-badge { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px;
       border-radius:20px; margin-left:6px; }
@@ -344,6 +373,21 @@
           </div>
         </div>
 
+        <div class="guest-form">
+          <div class="guest-field">
+            <label class="guest-flabel" for="res-name">Reservation name</label>
+            <input class="guest-input" type="text" id="res-name" placeholder="Who's this booking for?" maxlength="40">
+          </div>
+          <div class="guest-field guest-field-count">
+            <label class="guest-flabel" for="res-guests">Guests</label>
+            <div class="stepper">
+              <button type="button" class="stepper-btn" onclick="stepGuests(-1)">&minus;</button>
+              <input class="guest-input stepper-input" type="number" id="res-guests" value="1" min="1" max="12" inputmode="numeric">
+              <button type="button" class="stepper-btn" onclick="stepGuests(1)">+</button>
+            </div>
+          </div>
+        </div>
+
         <button class="reserve-btn" onclick="tryReserve()">Reserve (It's Free, Technically)</button>
         <p class="booking-note">You won't be charged &mdash; but you will owe the hosts one.</p>
 
@@ -352,6 +396,8 @@
           <div class="price-row"><span>Guilt fee</span><span>$0</span></div>
           <div class="price-row total"><span>Total</span><span id="total-price">$0 + feelings</span></div>
         </div>
+
+        <div class="my-reservations" id="my-reservations"></div>
 
       </div>
     </div>
@@ -371,7 +417,7 @@
       <!-- DESCRIPTION: EDIT this paragraph -->
       <div class="section">
         <h2 class="section-title">About this place</h2>
-        <p>Welcome to the legendary Greenboim Estate &mdash; a one-of-a-kind property nestled somewhere between &ldquo;guest room&rdquo; and &ldquo;just sit anywhere, there's room on the couch.&rdquo; Your host, Hadar, is a seasoned Superhost who has been involuntarily hosting siblings, cousins, parents, and the occasional stray friend since approximately 1997 &mdash; and since August 2025, hasn&rsquo;t had a break since. The vibe is <em>cozy-chaotic</em>: you'll be treated like family (because you are), which means you'll be offered snacks, then immediately judged for which ones you chose. The room comes fully furnished with Hadar's unsolicited opinions and a duvet of uncertain cleanliness. Minimum stay: however long it takes before the gentle hints about heading home begin.</p>
+        <p>Welcome to the legendary Greenboim Estate &mdash; a one-of-a-kind property nestled somewhere between &ldquo;guest room&rdquo; and &ldquo;just sit anywhere, there's room on the couch.&rdquo; Your host, Hadar, is a seasoned Superhost who has been involuntarily hosting siblings, cousins, parents, and the occasional stray friend since August 2025 &mdash; and hasn&rsquo;t had a break since. The vibe is <em>cozy-chaotic</em>: you'll be treated like family (because you are), which means you'll be offered snacks, then immediately judged for which ones you chose. The room comes fully furnished with Hadar's unsolicited opinions and a duvet so aggressively clean you'll be afraid to touch it. Minimum stay: however long it takes before the gentle hints about heading home begin.</p>
       </div>
 
       <!-- AMENITIES: EDIT items -->
@@ -533,6 +579,7 @@
     <p class="modal-msg">
       <strong id="modal-room-name">The Suite</strong><br>
       <span id="modal-dates" style="color:#555;font-size:14px;"></span><br>
+      Reserved for: <strong id="modal-resname">You</strong> &middot; <strong id="modal-guests">1 guest</strong><br>
       Breakfast: <strong id="modal-breakfast">Fuckerflakes</strong><br><br>
       Hadar has <strong>30 days</strong> to pretend the request was never received, and Udi has 30 more days to pretend he lost the Wi-Fi password.
       Pack light, bring your own snacks, and prepare a short speech about why you've made good life choices.
@@ -587,6 +634,7 @@
     calMonth = now.getMonth();
     renderCal();
     updateBadges();
+    renderMyReservations();
   });
 
   // ============================================================
@@ -609,6 +657,7 @@
     document.getElementById('nights-price').textContent = '—';
     document.getElementById('total-price').textContent = '$0 + feelings';
     renderCal();
+    renderMyReservations();
   }
 
   // ============================================================
@@ -768,23 +817,81 @@
   // ============================================================
   // RESERVE
   // ============================================================
+  function stepGuests(delta) {
+    var input = document.getElementById('res-guests');
+    var v = parseInt(input.value, 10);
+    if (isNaN(v)) v = 1;
+    v = Math.max(1, Math.min(12, v + delta));
+    input.value = v;
+  }
+
   function tryReserve() {
     if (!selStart || !selEnd) {
       document.getElementById('cal-selection-info').innerHTML =
         '<span style="color:#FF385C;">&#9888; Please select check-in and check-out dates first!</span>';
       return;
     }
+    var resName = document.getElementById('res-name').value.trim();
+    if (!resName) {
+      document.getElementById('cal-selection-info').innerHTML =
+        '<span style="color:#FF385C;">&#9888; Please enter a name for the reservation!</span>';
+      document.getElementById('res-name').focus();
+      return;
+    }
+    var guests = parseInt(document.getElementById('res-guests').value, 10);
+    if (isNaN(guests) || guests < 1) guests = 1;
+    if (guests > 12) guests = 12;
+
     var nights = Math.round((parseDate(selEnd)-parseDate(selStart))/(1000*60*60*24));
     var rName = ROOMS[currentRoom].name.replace(/&#[0-9]+;/g,'').trim();
     document.getElementById('modal-room-name').textContent = rName;
     document.getElementById('modal-dates').textContent = formatDate(selStart) + ' → ' + formatDate(selEnd) + ' (' + nights + ' night' + (nights===1?'':'s') + ')';
+    document.getElementById('modal-resname').textContent = resName;
+    document.getElementById('modal-guests').textContent = guests + ' guest' + (guests===1?'':'s');
     document.getElementById('modal-breakfast').textContent = selectedBreakfast === 'fuckerflakes' ? 'Fuckerflakes' : 'Kariot';
     showModal();
     // Add to booked (client-side only, resets on refresh)
-    ROOMS[currentRoom].booked.push({ name: 'You', from: selStart, to: selEnd });
+    ROOMS[currentRoom].booked.push({ id: Date.now(), name: resName, guests: guests, from: selStart, to: selEnd, mine: true });
     updateBadges();
     selStart = null; selEnd = null;
+    document.getElementById('res-name').value = '';
+    document.getElementById('res-guests').value = '1';
     renderCal();
+    renderMyReservations();
+  }
+
+  // ============================================================
+  // MY RESERVATIONS (cancellable, client-side)
+  // ============================================================
+  function renderMyReservations() {
+    var box = document.getElementById('my-reservations');
+    if (!box) return;
+    var mine = ROOMS[currentRoom].booked.filter(function(b) { return b.mine; });
+    if (!mine.length) { box.innerHTML = ''; return; }
+    var html = '<div class="my-res-title">Your reservations</div>';
+    mine.forEach(function(b) {
+      html += '<div class="res-item">' +
+        '<div class="res-info"><strong>' + escapeHtml(b.name) + '</strong> &middot; ' +
+        b.guests + ' guest' + (b.guests===1?'':'s') +
+        '<br><span class="res-dates">' + formatDate(b.from) + ' &rarr; ' + formatDate(b.to) + '</span></div>' +
+        '<button class="res-cancel" onclick="cancelReservation(' + b.id + ')">Cancel</button>' +
+        '</div>';
+    });
+    box.innerHTML = html;
+  }
+
+  function cancelReservation(id) {
+    var room = ROOMS[currentRoom];
+    room.booked = room.booked.filter(function(b) { return b.id !== id; });
+    updateBadges();
+    renderCal();
+    renderMyReservations();
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function(c) {
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
   }
 
   // ============================================================
