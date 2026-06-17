@@ -611,29 +611,24 @@
   </div>
 </div>
 
-<!-- Supabase client (shared reservations backend) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // ============================================================
-  // SUPABASE CONFIG
+  // SUPABASE CONFIG (direct REST via fetch — no client library)
   // ------------------------------------------------------------
   // Paste your project URL + anon (public) key below to enable
   // SHARED reservations (everyone sees the same bookings, on any
   // device). Until then, the site falls back to per-browser
-  // localStorage automatically.
-  //
-  // Setup (one time, ~3 min):
-  //   1. Create a free project at https://supabase.com
-  //   2. SQL editor → run the CREATE TABLE block from README/below
-  //   3. Project Settings → API → copy "Project URL" + "anon public"
-  //   4. Paste them here and re-deploy
+  // localStorage automatically. See SETUP_SUPABASE.md.
   // ============================================================
   var SUPABASE_URL = 'https://aioduawiknbwtnehpizl.supabase.co';
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpb2R1YXdpa25id3RuZWhwaXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MzEyNjUsImV4cCI6MjA5NzIwNzI2NX0.2GA1sAC05iahjx4Y8q7X-tqBQNcOeKJGrhzlG6h2eVo';
 
-  var sb = null;
-  if (SUPABASE_URL.indexOf('YOUR_') === -1 && SUPABASE_ANON_KEY.indexOf('YOUR_') === -1 && window.supabase) {
-    try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch (e) { sb = null; }
+  var SB_ENABLED = SUPABASE_URL.indexOf('YOUR_') === -1 && SUPABASE_ANON_KEY.indexOf('YOUR_') === -1;
+  var SB_REST = SUPABASE_URL + '/rest/v1/reservations';
+  function sbHeaders(extra) {
+    var h = { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' };
+    if (extra) { for (var k in extra) h[k] = extra[k]; }
+    return h;
   }
 
   // ============================================================
@@ -727,15 +722,17 @@
   }
 
   function refreshReservations() {
-    if (sb) {
-      sb.from('reservations').select('*').then(function(res) {
-        if (res.error) { console.warn('Supabase load failed, using local cache:', res.error.message); loadLocal(); renderAll(); return; }
-        var rows = (res.data || []).map(function(d) {
-          return { id: d.id, room: d.room, name: d.name, guests: d.guests, from: d.check_in, to: d.check_out };
-        });
-        rebuildBooked(rows);
-        renderAll();
-      });
+    if (SB_ENABLED) {
+      fetch(SB_REST + '?select=*', { headers: sbHeaders() })
+        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(function(data) {
+          var rows = (data || []).map(function(d) {
+            return { id: d.id, room: d.room, name: d.name, guests: d.guests, from: d.check_in, to: d.check_out };
+          });
+          rebuildBooked(rows);
+          renderAll();
+        })
+        .catch(function(e) { console.warn('Supabase load failed, using local cache:', e); loadLocal(); renderAll(); });
     } else {
       loadLocal();
       renderAll();
@@ -759,31 +756,33 @@
     rebuildBooked(rows);
   }
 
-  // ---- create / delete (Supabase or local) ----
+  // ---- create / delete (Supabase REST or local) ----
   function persistCreate(room, res) {
-    if (sb) {
-      sb.from('reservations').insert({
-        room: room, name: res.name, guests: res.guests, check_in: res.from, check_out: res.to
-      }).select().single().then(function(out) {
-        if (out.error) { console.warn('Supabase insert failed:', out.error.message); return; }
-        // Replace the temp id with the real DB id and mark as mine
-        myIds.delete(res.id);
-        myIds.add(out.data.id);
-        saveMyIds();
-        refreshReservations();
-      });
+    if (SB_ENABLED) {
+      fetch(SB_REST, {
+        method: 'POST',
+        headers: sbHeaders({ 'Prefer': 'return=representation' }),
+        body: JSON.stringify({ room: room, name: res.name, guests: res.guests, check_in: res.from, check_out: res.to })
+      })
+        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(function(data) {
+          var row = Array.isArray(data) ? data[0] : data;
+          if (row && row.id != null) {
+            myIds.delete(res.id); myIds.add(row.id); saveMyIds();
+          }
+          refreshReservations();
+        })
+        .catch(function(e) { console.warn('Supabase insert failed:', e); alert('Could not save the reservation — check your connection and try again.'); });
     } else {
       saveLocal();
       renderAll();
     }
   }
   function persistDelete(id) {
-    if (sb) {
-      sb.from('reservations').delete().eq('id', id).then(function(out) {
-        if (out.error) { console.warn('Supabase delete failed:', out.error.message); return; }
-        myIds.delete(id); saveMyIds();
-        refreshReservations();
-      });
+    if (SB_ENABLED) {
+      fetch(SB_REST + '?id=eq.' + encodeURIComponent(id), { method: 'DELETE', headers: sbHeaders() })
+        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); myIds.delete(id); saveMyIds(); refreshReservations(); })
+        .catch(function(e) { console.warn('Supabase delete failed:', e); refreshReservations(); });
     } else {
       saveLocal();
       renderAll();
