@@ -764,7 +764,12 @@
         headers: sbHeaders({ 'Prefer': 'return=representation' }),
         body: JSON.stringify({ room: room, name: res.name, guests: res.guests, check_in: res.from, check_out: res.to })
       })
-        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(function(r) {
+          return r.text().then(function(t) {
+            if (!r.ok) throw new Error('HTTP ' + r.status + (t ? ' — ' + t : ''));
+            return t ? JSON.parse(t) : null;
+          });
+        })
         .then(function(data) {
           var row = Array.isArray(data) ? data[0] : data;
           if (row && row.id != null) {
@@ -772,7 +777,11 @@
           }
           refreshReservations();
         })
-        .catch(function(e) { console.warn('Supabase insert failed:', e); alert('Could not save the reservation — check your connection and try again.'); });
+        .catch(function(e) {
+          console.warn('Supabase insert failed:', e);
+          var info = document.getElementById('cal-selection-info');
+          if (info) info.innerHTML = '<span style="color:#FF385C;">&#9888; Could not save: ' + escapeHtml(String(e.message || e)) + '</span>';
+        });
     } else {
       saveLocal();
       renderAll();
@@ -1024,15 +1033,17 @@
     document.getElementById('modal-guests').textContent = guests + ' guest' + (guests===1?'':'s');
     document.getElementById('modal-breakfast').textContent = selectedBreakfast === 'fuckerflakes' ? 'Fuckerflakes' : 'Kariot';
     showModal();
+    // Capture the selected dates BEFORE resetting the selection
+    var fromD = selStart, toD = selEnd;
     // Optimistic add (temp id); persistCreate syncs to the backend
     var tempId = Date.now();
-    ROOMS[currentRoom].booked.push({ id: tempId, name: resName, guests: guests, from: selStart, to: selEnd, mine: true });
+    ROOMS[currentRoom].booked.push({ id: tempId, name: resName, guests: guests, from: fromD, to: toD, mine: true });
     myIds.add(tempId); saveMyIds();
     selStart = null; selEnd = null;
     document.getElementById('res-name').value = '';
     document.getElementById('res-guests').value = '1';
     renderAll();
-    persistCreate(currentRoom, { id: tempId, name: resName, guests: guests, from: selStart, to: selEnd });
+    persistCreate(currentRoom, { id: tempId, name: resName, guests: guests, from: fromD, to: toD });
   }
 
   // ============================================================
